@@ -1,78 +1,113 @@
-# Task # 3
-# Suppose you are a hardware enthusiast and love checking the system’s details. 
-# To make your task easy you have to write a program that is used to check the hardware details of a system 
-# and generates a file for you; named “Specs.txt '' at a location “/home/Username/Details”. 
-# If the directory “Details'' does not exist on your system you have to create it. 
-# Details you are interested in are given below along with example values. 
-# Remember you are not allowed to code in iPython. You can only use the Python3 interpreter. 
-# Username will be the name of the user on your system for example “/home/<username>/Details''
-
-# Byte Order:          Little Endian
-# Core(s) per socket:  4
-# Socket(s):           1
-# Model name:          Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz
-# CPU MHz:             1638.462
-# CPU max MHz:         4000.0000
-# CPU min MHz:         400.0000
-# Virtualization Support:      VT-x
-# L1           32K
-# L2 cache:            256K
-# L3 cache:            8192K
-# RAM Memory: 15794MB
-
-# Note: You have to find a way to show only the hardware details mentioned above.
+"""
+Task # 3
+Byte Order:          Little Endian
+Core(s) per socket:  4
+Socket(s):           1
+Model name:          Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz
+CPU MHz:             1638.462
+CPU max MHz:         4000.0000
+CPU min MHz:         400.0000
+Virtualization Support:      VT-x
+L1           32K
+L2 cache:            256K
+L3 cache:            8192K
+RAM Memory: 15794MB """
 
 import psutil
-import platform
 from datetime import datetime
 import sys
-import os
 import subprocess
-import re
+import os
 
-cpu_sockets =  int(subprocess.check_output('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l', shell=True))
-print("number of sockets: ",cpu_sockets)
+# define the directory and file path
+username = os.getlogin()  # get the current user's username
+directory = f"/home/{username}/Details"
+file_path = os.path.join(directory, "Specs.txt")
 
-print(sys.byteorder, 'Endian')
-print("Core(s) per socket': " , psutil.cpu_count(logical=False))
+# ensure the directory exists
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
-def get_processor_name():
-    try:
-        result = subprocess.run(['lscpu'], capture_output=True, text=True, check=True)
-        lines = result.stdout.splitlines()
-        for line in lines:
-            if "Model name" in line:
-                # Split the line at the colon and strip any leading/trailing whitespace from the second part
-                return line.split(':', 1)[1].strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return "Unknown"
+def num_of_sockets():
+    # get the number of sockets
+    
+    # Execute the command and capture the output
+    cpu_sockets = subprocess.check_output("lscpu | grep 'Socket(s):' | awk '{print $2}'", shell=True, text=True)
+    
+    # Convert to integer and print the number of sockets
+    print("number of sockets: ", int(cpu_sockets))     
+    return f"Number of sockets: {int(cpu_sockets)}"
 
-print("Model Name: ", get_processor_name())
+def get_byte_order():
+    # get the byte order using sys library
+    print("Byte Order: " , sys.byteorder, 'Endian')    
+    return f"Byte Order: {sys.byteorder} Endian"
 
+def get_cores_per_socket():
+    # get the number of cores per socket using the lscpu command with the subprocess library
+    cps = subprocess.check_output("lscpu | grep 'Core(s) per socket:' | awk '{print $4}'", shell=True, text=True)
+    print("Core(s) per socket: " , cps)
+    return f"Core(s) per socket: {cps}"
+
+def get_process_name():
+    #get the processor name/model name
+    processor_name = subprocess.check_output("lscpu | grep 'Model name' | xargs ", shell=True, text=True)
+    print("Model name: ", str(processor_name))
+    return f"Model name: {processor_name}"
 
 def get_frequencies():
-    freqs = psutil.cpu_freq()
+    # get the cpu frequency, and the min and max frequencies
+    freq = subprocess.check_output("lscpu | grep 'CPU MHz:' | xargs | awk '{print $3}' ", shell=True, text=True)
+    print("CPU MHZ: ", freq)
     
-    print("CPU MHZ: ", freqs[0])
-    print("CPU min MHZ: ", freqs[1])
-    print("CPU max MHZ: ", freqs[2])
-    return()
-
+    maxfreq = subprocess.check_output("lscpu | grep 'CPU max MHz:' | xargs | awk '{print $4}' ", shell=True, text=True)
+    print("CPU max MHZ: ", maxfreq)
     
-get_frequencies()
-
+    minfreq = subprocess.check_output("lscpu | grep 'CPU min MHz:' | xargs | awk '{print $4}' ", shell=True, text=True)
+    print("CPU min MHZ: ", minfreq)
+    return f"CPU MHz: {freq}\n CPU max MHz: {maxfreq}\nCPU min MHz: {minfreq}"
 
 def get_virtualization_support():
-    """
-    Retrieves virtualization support information using lscpu command.
-    """
-    try:
-        result = subprocess.run(['lscpu'], capture_output=True, text=True, check=True)
-        lines = result.stdout.splitlines()
-        for line in lines:
-            if 'Virtualization' in line:
-                return line.split(':')[1].strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return "Unknown"
+    # get teh virtualization support     
+    virt = subprocess.check_output("lscpu | grep 'Virtualization' | xargs | awk '{print $2}' ", shell=True, text=True)
+    print("Virtualization: ", str(virt))
+    return f"Virtualization: {virt}"
     
-print(get_virtualization_support())
+def get_cache_size():
+    #get L!i, L2 and L3 cache sizes
+    l1 = subprocess.check_output("lscpu | grep 'L1i cache:' | xargs | awk '{print $3}' ", shell=True, text=True)
+    print("L1 Cache: ", str(l1))
+    
+    l2 = subprocess.check_output("lscpu | grep 'L2 cache:' | xargs | awk '{print $3}' ", shell=True, text=True)
+    print("L1 Cache: ", str(l2))
+    
+    l3 = subprocess.check_output("lscpu | grep 'L3 cache:' | xargs | awk '{print $3}' ", shell=True, text=True)
+    print("L3 Cache: ", str(l3))
+    return f"L1 Cache: {l1}\nL2 Cache: {l2}\nL3 Cache: {l3}"
+
+def get_RAM_Mem():
+    #get the RAM Memory using psutil
+    ram = psutil.virtual_memory().total
+    print("RAM Memory: ", ram//(1024 **2), " MB") #convert it to MBs
+    return f"RAM Memory: {ram//(1024**2)} MB"
+
+def main():
+    # gather and print hardware details and save the in specs.txt
+    details = [ 
+                get_byte_order(),
+                get_cores_per_socket(),
+                num_of_sockets(),
+                get_process_name(),
+                get_frequencies(),
+                get_virtualization_support(),
+                get_cache_size(),
+                get_RAM_Mem(),
+                ]
+    
+    with open(file_path, 'w') as file:
+        file.write("\n".join(details)) #use join to join the outputs of the list.
+        
+    
+if __name__ == "__main__":
+    
+    main()
