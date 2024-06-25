@@ -22,7 +22,7 @@ def process_input():
         # word = input().strip()
         # wordarray.append(word)
         while True:
-            word = input()
+            word = input().strip()
             if word:  # Check if word is not empty
                 wordarray.append(word)
                 break
