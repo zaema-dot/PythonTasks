@@ -26,28 +26,32 @@ def monte_carlo(its):
     return(points_in_circle/total_points)*4
 
 def main():
-    print("here")
+    # create an argparse object to process the command line arguments
     parser = argparse.ArgumentParser(description = "monte carlo for pi estimation", usage="Monte Carlo simulation for estimating the value of π.\nUsage examples:\npython Main.py -i 100000\npython Main.py -j") 
+    # add the argument for the -i flag that defines the number of iterations
     parser.add_argument('-i', type = int, help ="number of iterations")
+    # add the argument for the -j flag that takes the number of iterations from iterations.json
     parser.add_argument('-j', action = 'store_true', help = "read the json file")
 
     args = parser.parse_args()
     
-    if args.j:
+    if args.j: #if the command line flag is j then read the json file 
         try:
             with open('iterations.json','r') as file:
                 content = json.load(file)
                 its = content['iterations']
-        except FileNotFoundError:
-            print("Error: Iterations.json file not found.")
+        except FileNotFoundError: # error exception if the file doesn't exist
+            print("Error: iterations.json file not found.")
+        except KeyError:
+            print("the key does not exist")
             return
-    elif args.i:
+    elif args.i: # if the command line flag is i then set the number of iterations to that input
         its = args.i
     else:
         parser.print_help()
         return
     
-    pi = monte_carlo(its)
+    pi = monte_carlo(its) # estimate the value of pi and print it
     print(f"estimated value of pi after {its} iterations = {pi}")
         
     
