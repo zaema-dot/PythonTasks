@@ -40,7 +40,8 @@ def num_of_sockets():
 
 def get_byte_order():
     # get the byte order using sys library
-    print("Byte Order: " , sys.byteorder, 'Endian')    
+    print("Byte Order: " , sys.byteorder, 'Endian')
+    get_cores_per_socket()    
     return f"Byte Order: {sys.byteorder} Endian"
 
 def get_cores_per_socket():
@@ -91,17 +92,22 @@ def get_RAM_Mem():
     print("RAM Memory: ", ram//(1024 **2), " MB") #convert it to MBs
     return f"RAM Memory: {ram//(1024**2)} MB"
 
+def get_numa_node():
+    node = subprocess.check_output("lscpu | grep 'NUMA node(s):' | xargs | awk '{print $3}' ", shell = True, text = True)
+    print("node = ", str(node))
+    return f"node = {node} \n"
+
 def main():
     # gather and print hardware details and save the in specs.txt
     details = [ 
                 get_byte_order(),
-                get_cores_per_socket(),
                 num_of_sockets(),
                 get_process_name(),
                 get_frequencies(),
                 get_virtualization_support(),
                 get_cache_size(),
                 get_RAM_Mem(),
+                get_numa_node()
                 ]
     
     with open(file_path, 'w') as file:

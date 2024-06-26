@@ -15,21 +15,22 @@ def plot_graph(x, sq, cu):
     # set the figure dimensions
     plt.figure(figsize =(10, 5))
     # create two subplots, this one's the first plot
-    plt.subplot(1,2,1)
+    # plt.subplot(1,2,1)
     # plot data points
     plt.plot(x, sq)
+    plt.plot(x,cu)
     plt.title('Square of Numbers')
     plt.xlabel('Number')
     plt.ylabel('Square')
     plt.grid(True)
     
-    # Plot cube
-    plt.subplot(1, 2, 2)
-    plt.plot(x, cu)
-    plt.title('Cube of Numbers')
-    plt.xlabel('Number')
-    plt.ylabel('Cube')
-    plt.grid(True)
+    # # Plot cube
+    # plt.subplot(1, 2, 2)
+    # plt.plot(x, cu)
+    # plt.title('Cube of Numbers')
+    # plt.xlabel('Number')
+    # plt.ylabel('Cube')
+    # plt.grid(True)
 
     # Show the plots
     plt.tight_layout() # make sure plots fit in the figure area.

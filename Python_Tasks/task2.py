@@ -81,4 +81,5 @@ def main():
 if __name__ == "__main__":
     
     main()
+    #check if u can take another input from the command line after a wrong input.
 

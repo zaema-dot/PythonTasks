@@ -1,7 +1,6 @@
 import sys
 
 # Function to take user input and process it
-# Function to take user input and process it
 def process_input():
     # Read the number of words
     try:
@@ -19,8 +18,6 @@ def process_input():
     # Take words as input from the user
     print("Enter the words:")
     for _ in range(num_words):
-        # word = input().strip()
-        # wordarray.append(word)
         while True:
             word = input().strip()
             if word:  # Check if word is not empty
